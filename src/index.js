@@ -14,6 +14,9 @@ function stringToUint8Array(s) {
   }
   return result;
 }
+function Uint8ArrayToString(u) {
+  return String.fromCharCode.apply(String, u)
+}
 function name(address) {
   return (address[0] / 256 + address[1] /65536 + address[2]/56/256/256 + address[3]/256/256/256/256).toString(2).slice(2, 11);
 }
@@ -30,12 +33,13 @@ class Node {
     this.address = stringToUint8Array(address.data);
     this.peers = [];
   }
-  addConnection(peer) {
+  async addConnection(peer) {
     const encoded = msgpack.encode({address: this.address});
-    peer.send(encoded)
-    peer.onmessage = (msg) => {
-      this.log(msgpack.decode(msg))
-    };
+    peer.send(this.publicKey)
+    const remotePublicKey = await new Promise(resolve => peer.onmessage = resolve);
+    this.log(remotePublicKey);
+    let remoteAddress = stringToUint8Array(forge.md.sha256.create().update(Uint8ArrayToString(remotePublicKey)).digest().data)
+    this.log('remoteAddress:', name(remoteAddress));
   }
   log() {
     if(this.doLog) {
@@ -45,7 +49,6 @@ class Node {
     }
   }
 }
-
 async function createNode({port, url, servers, doLog= true}) {
   const t0 = Date.now();
   const node = new Node({doLog, privateKey: await promisify(forge.pki.rsa.generateKeyPair)({bits: rsaBits})});
