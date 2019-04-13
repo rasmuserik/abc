@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "msgpack-lite": "^0.1.26",
+    "node-forge": "^0.8.2",
+    "simple-peer": "^9.3.0",
+    "ws": "^6.2.1"
+  },
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "deploy": "webpack && (cp * dist/ ; gh-pages -d dist)",
+    "prettier": "prettier --write src/*"
+  },
+  "devDependencies": {
+    "gh-pages": "^2.0.1",
+    "prettier": "^1.16.4",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1"
+  }
+}
